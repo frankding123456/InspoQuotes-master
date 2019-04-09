@@ -40,24 +40,41 @@ class QuoteTableViewController: UITableViewController {
 
     // MARK: - Table view data source
 
-//    override func numberOfSections(in tableView: UITableView) -> Int {
-//        // #warning Incomplete implementation, return the number of sections
-//        return 0
-//    }
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        // #warning Incomplete implementation, return the number of sections
+        return 1
+    }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return quotesToShow.count
+        
+        return quotesToShow.count + 1
+        
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "QuoteCell", for: indexPath)
-
+        if indexPath.row < quotesToShow.count {
      cell.textLabel?.text = quotesToShow[indexPath.row]
         cell.textLabel?.numberOfLines = 0
-
+        }else{
+            cell.textLabel?.text = "Get More Quotes"
+            cell.textLabel?.textColor = #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)
+            cell.accessoryType = .disclosureIndicator
+        }
         return cell
+    }
+    
+    //tableview delegate methods
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row == quotesToShow.count {
+            buyPremiumQuotes()
+        }
+    }
+    
+    func buyPremiumQuotes () {
+        
     }
  
 
