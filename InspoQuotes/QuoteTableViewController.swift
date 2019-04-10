@@ -7,8 +7,10 @@
 //
 
 import UIKit
+import StoreKit
 
-class QuoteTableViewController: UITableViewController {
+class QuoteTableViewController: UITableViewController, SKPaymentTransactionObserver {
+    let productID = "com.Frank123456.InspoQuotes.PremiumQuotes"
     
     var quotesToShow = [
         "Our greatest glory is not in never falling, but in rising every time we fall. — Confucius",
@@ -31,6 +33,7 @@ class QuoteTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        SKPaymentQueue.default().add(self)
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -71,10 +74,34 @@ class QuoteTableViewController: UITableViewController {
         if indexPath.row == quotesToShow.count {
             buyPremiumQuotes()
         }
+        tableView.deselectRow(at: indexPath, animated: true)
+
     }
     
     func buyPremiumQuotes () {
+        if SKPaymentQueue.canMakePayments() {
+            let paymentRequest = SKMutablePayment()
+            paymentRequest.productIdentifier = productID
+            SKPaymentQueue.default().add(paymentRequest)
+        }
         
+    }
+    
+    func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
+        for transaction in transactions {
+            if transaction.transactionState == .purchased {
+                SKPaymentQueue.default().finishTransaction(transaction)
+                print("sucess")
+            }else if transaction.transactionState == .failed{
+                
+                if let error = transaction.error {
+                    let errorDescribtion = error.localizedDescription
+                    print("\(errorDescribtion)")
+                }
+                SKPaymentQueue.default().finishTransaction(transaction)
+                print("failed")
+            }
+        }
     }
  
 
