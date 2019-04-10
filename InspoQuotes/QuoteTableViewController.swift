@@ -32,6 +32,9 @@ class QuoteTableViewController: UITableViewController, SKPaymentTransactionObser
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        if isPurchased() {
+            showPremiumQuotes()
+        }
 
         SKPaymentQueue.default().add(self)
         // Uncomment the following line to preserve selection between presentations
@@ -61,6 +64,8 @@ class QuoteTableViewController: UITableViewController, SKPaymentTransactionObser
         if indexPath.row < quotesToShow.count {
      cell.textLabel?.text = quotesToShow[indexPath.row]
         cell.textLabel?.numberOfLines = 0
+            cell.textLabel?.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+            cell.accessoryType = .none
         }else{
             cell.textLabel?.text = "Get More Quotes"
             cell.textLabel?.textColor = #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)
@@ -91,6 +96,8 @@ class QuoteTableViewController: UITableViewController, SKPaymentTransactionObser
         for transaction in transactions {
             if transaction.transactionState == .purchased {
                 SKPaymentQueue.default().finishTransaction(transaction)
+                UserDefaults.standard.set(true, forKey: productID)
+                showPremiumQuotes()
                 print("sucess")
             }else if transaction.transactionState == .failed{
                 
@@ -103,7 +110,21 @@ class QuoteTableViewController: UITableViewController, SKPaymentTransactionObser
             }
         }
     }
+    
+    func showPremiumQuotes () {
+        quotesToShow.append(contentsOf: premiumQuotes)
+        tableView.reloadData()
+    }
  
+    func isPurchased () -> Bool{
+        let purchaseStatus = UserDefaults.standard.bool(forKey: productID)
+        
+        if purchaseStatus == true {
+            return true
+        }else{
+            return false
+        }
+    }
 
     /*
     // Override to support conditional editing of the table view.
