@@ -53,9 +53,11 @@ class QuoteTableViewController: UITableViewController, SKPaymentTransactionObser
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        
+        if isPurchased() {
+            return quotesToShow.count
+        }else{
         return quotesToShow.count + 1
-        
+        }
     }
 
     
@@ -96,7 +98,6 @@ class QuoteTableViewController: UITableViewController, SKPaymentTransactionObser
         for transaction in transactions {
             if transaction.transactionState == .purchased {
                 SKPaymentQueue.default().finishTransaction(transaction)
-                UserDefaults.standard.set(true, forKey: productID)
                 showPremiumQuotes()
                 print("sucess")
             }else if transaction.transactionState == .failed{
@@ -105,15 +106,23 @@ class QuoteTableViewController: UITableViewController, SKPaymentTransactionObser
                     let errorDescribtion = error.localizedDescription
                     print("\(errorDescribtion)")
                 }
+            
                 SKPaymentQueue.default().finishTransaction(transaction)
                 print("failed")
+            }
+            else if transaction.transactionState == .restored {
+                showPremiumQuotes()
+                SKPaymentQueue.default().finishTransaction(transaction)
+                navigationItem.setRightBarButton(nil, animated: true)
             }
         }
     }
     
     func showPremiumQuotes () {
+        UserDefaults.standard.set(true, forKey: productID)
         quotesToShow.append(contentsOf: premiumQuotes)
         tableView.reloadData()
+        
     }
  
     func isPurchased () -> Bool{
@@ -176,6 +185,7 @@ class QuoteTableViewController: UITableViewController, SKPaymentTransactionObser
     
     
     @IBAction func restorePressed(_ sender: UIBarButtonItem) {
+        SKPaymentQueue.default().restoreCompletedTransactions()
         
     }
 
